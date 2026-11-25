@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Tempered concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a shipped shop-floor product, calm and exact
+   IDEA: the operations app a shop owner opens every morning
+   PICTURE: each screen is the working tool itself, clickable
+   COLOUR and TYPE: Tempered system: navy rail, blue on track, orange needs you, gold waiting; IBM Plex
+   LAYOUT: navy rail, sticky top bar, one tool per view; rail becomes a top strip below 900px */
+:root{color-scheme:light dark;
+--bg:light-dark(#F2F5F7,#0A1621);--raised:light-dark(#FFFFFF,#122636);--sunken:light-dark(#E6ECF0,#0E1E2C);
+--line:light-dark(#C9D3DB,#2A4256);--ink:light-dark(#0E2A3F,#E8EEF2);--muted:light-dark(#4F6B80,#9DB2C2);
+--cool:light-dark(#2F7FB8,#5AA6DC);--cool-ink:light-dark(#1C5F8F,#8CC4EA);--cool-soft:light-dark(#DCEBF6,#16344D);
+--hot:light-dark(#D9622B,#F07F45);--hot-ink:light-dark(#A8461A,#F6A27A);--hot-soft:light-dark(#FBE3D6,#3A2216);
+--hold:light-dark(#C38A12,#E2B04A);--hold-ink:light-dark(#7A5507,#EBC777);--hold-soft:light-dark(#FAF0D6,#33290F);
+--rail:light-dark(#0E2A3F,#07131D);--mono:'IBM Plex Mono',ui-monospace,monospace}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'IBM Plex Sans',system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,p{margin:0}h1{font-size:clamp(30px,4vw,44px);line-height:1.08;font-weight:500;text-wrap:balance}
+h2{font-size:22px;font-weight:500;line-height:1.2}h3{font-size:17px;font-weight:500}
+a{color:var(--cool-ink)}.mono{font-family:var(--mono)}.muted{color:var(--muted)}.small{font-size:14px}
+.app{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100vh}
+.rail{background:var(--rail);color:#E8EEF2;padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:2px;overflow:auto}
+.logo{display:flex;align-items:center;gap:10px;padding:0 10px 18px;font-size:24px;font-weight:500;letter-spacing:-.02em;color:#fff;text-decoration:none}
+.logo .pt{color:#F07F45}.grp{font-size:13px;color:#7F98AB;padding:14px 12px 4px}
+.nav{display:flex;align-items:center;gap:10px;min-height:42px;padding:8px 12px;border-radius:8px;color:#B9CBD8;text-decoration:none;font-size:15px}
+.nav:hover{background:#163850;color:#fff}.nav.on{background:#1E4664;color:#fff}
+.nav i{width:8px;height:8px;border-radius:50%;background:#4E6E86;flex:none}.nav.on i{background:#5AA6DC}
+.railfoot{margin-top:auto;padding:16px 12px 0;font-size:13px;color:#7F98AB}
+.top{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;padding:14px clamp(16px,3vw,32px);background:var(--raised);border-bottom:1px solid var(--line)}
+.top h2{margin-right:auto}
+select,input,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--raised);border:1px solid var(--line);border-radius:8px;padding:9px 12px;min-height:44px}
+textarea{min-height:88px;width:100%;resize:vertical}
+:is(select,input,textarea,button,a):focus-visible{outline:3px solid var(--cool);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid var(--line);background:var(--raised);color:var(--ink);font:500 15px/1.2 'IBM Plex Sans',sans-serif;cursor:pointer;text-decoration:none}
+.btn:hover{border-color:var(--cool)}.btn.pri{background:var(--cool);border-color:var(--cool);color:#fff}.btn.pri:hover{filter:brightness(1.08)}
+.btn.warn{color:var(--hot-ink);border-color:var(--hot)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{min-height:36px;padding:0 12px;font-size:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:500;white-space:nowrap;background:var(--sunken);color:var(--muted)}
+.cool{background:var(--cool-soft);color:var(--cool-ink)}.hot{background:var(--hot-soft);color:var(--hot-ink)}.hold{background:var(--hold-soft);color:var(--hold-ink)}
+.view{display:none;padding:24px clamp(16px,3vw,32px) 56px}.view.on{display:block}
+.card{background:var(--raised);border:1px solid var(--line);border-radius:10px;padding:18px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}.stackv{display:flex;flex-direction:column;gap:12px}
+.split{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;align-items:start}.split.q{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}
+.note{font-size:13px;color:var(--muted)}
+/* start */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center;margin-bottom:28px}
+.strip{display:grid;grid-template-rows:repeat(4,1fr);height:220px;border-radius:14px;overflow:hidden}
+.strip div{display:flex;align-items:center;padding:0 22px;font-size:15px;color:#0E2A3F}.strip div:nth-child(3),.strip div:nth-child(4){color:#fff}
+.steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.step{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit}.step:hover{border-color:var(--cool)}
+.step .n{font-family:var(--mono);font-size:14px;color:var(--cool-ink)}
+/* scorecard */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.tile{text-align:left;cursor:pointer;font:inherit;color:inherit;display:flex;flex-direction:column;gap:6px}
+.tile.sel{outline:2px solid var(--cool);outline-offset:-1px}.tile .v{font-family:var(--mono);font-size:clamp(24px,2.4vw,30px);line-height:1.1}
+.fig{position:relative;height:200px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.bars .b{display:grid;grid-template-columns:8.5em minmax(0,1fr) 3em;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.track{height:10px;background:var(--sunken);border-radius:5px;overflow:hidden}.fill{height:100%;background:var(--cool);border-radius:5px}
+/* board */
+.board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(232px,1fr);gap:12px;overflow-x:auto;padding-bottom:10px}
+.col{background:var(--sunken);border-radius:10px;padding:10px;min-height:460px;display:flex;flex-direction:column;gap:8px;transition:outline-color .15s}
+.col.over{outline:2px dashed var(--cool)}.colh{display:flex;justify-content:space-between;font-size:14px;font-weight:500;padding:2px 4px 6px}
+.jc{background:var(--raised);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;cursor:grab}
+.jc .id{font-family:var(--mono);font-size:14px}.jc .meta{font-size:13px;color:var(--muted)}
+.jc.flash{animation:fl 1.2s ease-out}@keyframes fl{from{background:var(--cool-soft)}}
+@media (prefers-reduced-motion:reduce){.jc.flash{animation:none}}
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:15px}th{font-weight:500;font-size:13px;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}tr.click{cursor:pointer}tr.click:hover td{background:var(--sunken)}tr.sel td{background:var(--cool-soft)}
+.num{text-align:right;font-family:var(--mono);white-space:nowrap}
+.scroll{overflow-x:auto}
+/* forms */
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.form label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
+.form .wide{grid-column:1/-1}.thumbs{display:flex;gap:8px;flex-wrap:wrap}.thumbs img,.thumbs span{width:72px;height:72px;border-radius:8px;object-fit:cover;background:var(--sunken);display:block}
+/* test */
+.tubes{display:grid;grid-template-columns:repeat(24,24px);gap:5px;padding:14px;background:var(--sunken);border-radius:10px;width:max-content}
+.tube{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);background:var(--raised);padding:0;cursor:pointer}
+.tube.leak{background:var(--hot);border-color:var(--hot)}.tube:hover{border-color:var(--cool)}
+.kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+/* quotes */
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.opt{display:flex;flex-direction:column;gap:8px}.opt .p{font-family:var(--mono);font-size:26px}
+.opt.won{outline:2px solid var(--cool);outline-offset:-1px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--raised);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.chip.on{background:var(--ink);color:var(--raised);border-color:var(--ink)}
+.custview{background:var(--sunken);border-radius:12px;padding:18px}
+/* timeline */
+.tl{list-style:none;margin:0;padding:0}.tl li{display:grid;grid-template-columns:4.5em minmax(0,1fr);gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.tl b{font-weight:500}
+/* phone */
+.phonewrap{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:28px;align-items:start}
+.phone{background:#050D14;border-radius:40px;padding:12px;box-shadow:0 18px 40px rgb(8 20 30/.25)}
+.scr{background:#0A1621;color:#E8EEF2;border-radius:30px;min-height:640px;padding:22px 16px;display:flex;flex-direction:column;gap:12px}
+.scr .muted{color:#9DB2C2}.scr .card{background:#122636;border-color:#2A4256}
+.big{width:100%;min-height:56px;border-radius:12px;border:0;font:500 18px 'IBM Plex Sans',sans-serif;cursor:pointer;background:#5AA6DC;color:#06121C}
+.big.stop{background:#F07F45}.big.ghost{background:#163850;color:#E8EEF2}
+.pu{width:100%;text-align:left;background:#122636;border:1px solid #2A4256;color:#E8EEF2;border-radius:12px;padding:12px 14px;font:inherit;cursor:pointer}
+.pu.on{border-color:#5AA6DC;background:#16344D}.clock{font-family:var(--mono);font-size:30px}
+.ops{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.ops button{min-height:44px;border-radius:10px;border:1px solid #2A4256;background:#0E1E2C;color:#E8EEF2;font:inherit;font-size:14px;cursor:pointer}
+.ops button.on{background:#5AA6DC;color:#06121C;border-color:#5AA6DC}
+/* modal + toast */
+.modal{position:fixed;inset:0;z-index:50;background:rgb(6 16 24/.55);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.on{display:flex}.sheet{background:var(--raised);border-radius:14px;max-width:680px;width:100%;max-height:92vh;overflow:auto;padding:24px;display:flex;flex-direction:column;gap:14px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--raised);padding:12px 18px;border-radius:10px;font-size:15px;max-width:calc(100vw - 32px);opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+@media(max-width:900px){.app{grid-template-columns:1fr}.rail{position:sticky;height:auto;flex-direction:row;align-items:center;overflow-x:auto;padding:10px 12px;gap:4px;z-index:6}
+.logo{padding:0 10px 0 4px;font-size:20px;flex:none}.grp,.railfoot{display:none}.nav{flex:none;white-space:nowrap}
+.top{top:62px}.split,.split.q,.hero,.phonewrap{grid-template-columns:1fr}.strip{height:160px}}
+@media(max-width:600px){.form,.kv{grid-template-columns:1fr}.top h2{width:100%}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="rail">
+<a class="logo" href="#start"><svg aria-label="Tempered mark" viewBox="0 0 120 120" width="28" height="28"><defs><clipPath id="lc"><rect width="120" height="120" rx="22"/></clipPath></defs><g clip-path="url(#lc)"><rect width="120" height="30" fill="#E8C67A"/><rect y="30" width="120" height="30" fill="#C2843F"/><rect y="60" width="120" height="30" fill="#8A68B5"/><rect y="90" width="120" height="30" fill="#5AA6DC"/></g></svg><span>tempered<span class="pt">.</span></span></a>
+<a class="nav" href="#start"><i></i>Start here</a>
+<div class="grp">Owner</div>
+<a class="nav" href="#scorecard"><i></i>Scorecard</a>
+<div class="grp">Shop floor</div>
+<a class="nav" href="#intake"><i></i>Intake</a>
+<a class="nav" href="#board"><i></i>Shop board</a>
+<a class="nav" href="#job"><i></i>Multi-unit job</a>
+<a class="nav" href="#test"><i></i>Test and QC</a>
+<a class="nav" href="#myday"><i></i>Tech phone</a>
+<div class="grp">Office</div>
+<a class="nav" href="#quote"><i></i>Quotes</a>
+<a class="nav" href="#library"><i></i>Build library</a>
+<p class="railfoot">Concept prototype. Sample data only; nothing here connects to a real system.</p>
+</aside>
+<main>
+<header class="top"><h2 id="vt">Start here</h2>
+<label class="row small muted" for="shop">Shop <select id="shop"><option>All shops</option><option>Louisville</option><option>Evansville</option><option>Toledo</option></select></label>
+<span class="pill">Concept · sample data</span></header>
+
+<section class="view" id="v-start">
+<div class="hero">
+<div class="stackv"><h1>Follow one unit from the dock to the invoice.</h1>
+<p class="muted">This is a clickable concept of Tempered V1 for a heat-transfer shop. Every screen works: open a job, move it on the board, mark leaks on a test, send a quote, clock a tech onto a unit. What you do on one screen shows up on the others.</p>
+<div class="row"><a class="btn pri" href="#intake">Start with intake</a><a class="btn" href="#scorecard">Jump to the scorecard</a></div></div>
+<div class="strip" aria-label="Tempered colour strip"><div style="background:#E8C67A">Received</div><div style="background:#C2843F">Tested and quoted</div><div style="background:#8A68B5">Rebuilt</div><div style="background:#2F7FB8">Tested, signed off, invoiced</div></div>
+</div>
+<div class="steps" id="steps"></div>
+<p class="note" style="margin-top:18px">Customers, people, serials and numbers are made up. Built to show the V1 scope, not the finished product.</p>
+</section>
+
+<section class="view" id="v-scorecard">
+<div class="row" style="justify-content:space-between;margin-bottom:16px"><div><h1 id="sc-h" style="font-size:28px"></h1><p class="muted small">Every number comes from work captured at intake, the bench and the counter. Nobody fills in a report.</p></div>
+<div class="row"><button class="btn sm" data-act="week" data-d="-1" aria-label="Previous week">← Prev</button><span class="mono" id="wk"></span><button class="btn sm" data-act="week" data-d="1" aria-label="Next week">Next →</button></div></div>
+<div class="tiles" id="tiles"></div>
+<div class="card" style="margin-top:16px"><div class="split"><div><h3 id="kd-t"></h3><p class="muted small" id="kd-s"></p><div class="fig" id="sparkbox" style="margin-top:10px"><svg id="spark" aria-label="Eight-week trend"></svg></div></div><div id="kd-b"></div></div></div>
+</section>
+
+<section class="view" id="v-board">
+<div class="row" style="justify-content:space-between;margin-bottom:14px"><p class="muted">Drag a card to another column, or use the arrow. Gold means waiting too long; orange needs someone.</p><a class="btn" href="#intake">+ New job</a></div>
+<div class="board" id="boardgrid"></div>
+</section>
+
+<section class="view" id="v-intake">
+<div class="split"><form class="card form" id="intakeForm">
+<h2 class="wide">New job at the counter</h2>
+<label>Customer<select name="cust"><option>Northgate Data Center</option><option>Valley Freight Lines</option><option>Hartwell Quarry</option><option>Cedar Run Power</option><option>Midland Ag Supply</option><option>Bluestem Transit</option></select></label>
+<label>Shop<select name="shop"><option>Louisville</option><option>Evansville</option><option>Toledo</option></select></label>
+<label>Unit<select name="what"><option>Radiator</option><option>Charge air cooler</option><option>Oil cooler</option><option>Generator radiator</option><option>Condenser</option><option>Cooling coil</option><option>Tube and shell exchanger</option></select></label>
+<label>Construction<select name="cons"><option>Soldered copper/brass</option><option>Bolted tank</option><option>Aluminum TIG-welded</option><option>Replaceable tube</option><option>Tube and shell</option></select></label>
+<label>How many units<input name="n" type="number" min="1" max="24" value="1"></label>
+<label>Core size (W × H × D)<input name="core" placeholder="36 × 32 × 3 row"></label>
+<label class="wide">What the customer says<textarea name="complaint">Leaking at the lower tank seam, running hot under load.</textarea></label>
+<label>Promised date<input name="due" type="date" value="2026-12-04"></label>
+<label>Photos<input name="photos" type="file" accept="image/*" multiple></label>
+<div class="thumbs wide" id="thumbs"></div>
+<div class="wide row"><button class="btn pri" type="submit">Open job and print tag</button><span class="note">Replaces the paper junk slip. One record from here to the invoice.</span></div>
+</form>
+<div class="card stackv"><h3>What this saves</h3><p class="small">Today a unit comes in on a paper slip, gets typed again for billing, and its history lives in someone's memory.</p><p class="small">Here, the counter opens the job once. The tag links the physical unit to its record, the board shows it at once, and every test, hour and part lands on the same job.</p><p class="note">Bet 1 · Units and jobs</p></div></div>
+</section>
+
+<section class="view" id="v-job">
+<div class="row" style="justify-content:space-between;margin-bottom:14px"><div><h1 style="font-size:28px"><span class="mono">WO-200418</span> · Northgate Data Center</h1><p class="muted">Six cooling coils, one job. Each coil has its own status, tech, hours and test. Louisville · promised Dec 2</p></div><button class="btn" data-act="invoice">Invoice from this job</button></div>
+<div class="card" style="margin-bottom:16px"><div id="jobbar"></div></div>
+<div class="split"><div class="card scroll"><table id="units"></table></div><div class="card stackv" id="unitside"></div></div>
+</section>
+
+<section class="view" id="v-test">
+<div class="split"><div class="card stackv">
+<div class="row" style="justify-content:space-between"><label class="row small muted">Unit <select id="tunit"></select></label><span id="tres"></span></div>
+<div class="kv"><label class="stackv small muted" style="gap:6px">Test<select id="ttype"><option>Inspection test</option><option>Final test</option></select></label>
+<label class="stackv small muted" style="gap:6px">Method<select id="tmeth"><option>Air under water</option><option>Nitrogen</option><option>Hydrostatic</option><option>Flow test</option></select></label>
+<label class="stackv small muted" style="gap:6px">Pressure (psi) and hold (min)<span class="row" style="flex-wrap:nowrap;gap:6px"><input id="tpsi" type="number" style="width:50%"><input id="thold" type="number" style="width:50%"></span></label></div>
+<div><p class="small muted" style="margin-bottom:8px">Tube map: tap a tube to mark a leak. 4 rows × 24 tubes, inlet on the left.</p><div class="scroll"><div class="tubes" id="tubes"></div></div></div>
+<div class="row"><label class="row small muted">Signed off by <select id="tsigner"><option value="">Choose tech</option><option>R. Alvarez</option><option>D. Pruitt</option><option>K. Monroe</option><option>J. Tran</option></select></label><button class="btn pri" data-act="sign" id="tsign">Sign off test</button></div>
+</div>
+<div class="card stackv"><h3>QC checklist · replaceable tube</h3><div id="qc" class="stackv small"></div><p class="note">Bet 4 · Test and QC. A unit can't move to Ready until the final test is signed and the checklist is complete.</p></div></div>
+</section>
+
+<section class="view" id="v-quote">
+<div class="split q"><div class="card"><h3 style="margin-bottom:8px">Quotes by age</h3><div id="qlist"></div></div><div class="card stackv" id="qdet"></div></div>
+</section>
+
+<section class="view" id="v-library">
+<div class="row" style="margin-bottom:14px"><input id="libq" type="search" placeholder="Search part number, OEM, customer or size, e.g. 38.5 or CAT" style="flex:1 1 320px"><div class="chips" id="libchips"></div></div>
+<div class="split"><div class="card scroll"><table class="stack" id="libt"></table></div><div class="card stackv" id="libd"></div></div>
+</section>
+
+<section class="view" id="v-myday">
+<div class="phonewrap"><div class="phone"><div class="scr" id="scr"></div></div>
+<div class="stackv"><h1 style="font-size:28px">What the tech sees.</h1><p class="muted">One hand, big targets, three taps or fewer. Clock in for the day, clock onto a unit and an operation, switch in one tap, pause with a reason. Every minute lands on the right unit, so productivity and estimated vs. actual hours fill in on their own.</p>
+<div class="card stackv" id="daysum"></div><p class="note">The demo clock runs 60 times faster: one second here is one minute on the floor. Bet 2 · Tech time</p></div></div>
+</section>
+</main></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+{
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=v=>'$'+Math.round(v).toLocaleString('en-US');
+const ST=['Received','Inspection test','Waiting approval','In rebuild','Final test','Ready'];
+const SHARE={Louisville:.45,Evansville:.33,Toledo:.22},OFF={Louisville:1.4,Evansville:-.7,Toledo:-1.5};
+const WEEKS=['Sep 29','Oct 6','Oct 13','Oct 20','Oct 27','Nov 3','Nov 10','Nov 17'];
+const S={shop:'All shops',week:7,kpi:'rev',next:200424,usel:0,tunit:'Coil A1',qsel:'QT-5512',cust:false,lost:null,lostOpen:false,libType:'All',spec:'RX-44718'};
+const jobs=[
+{id:'WO-200418',cust:'Northgate Data Center',what:'Cooling coils',n:6,shop:'Louisville',st:'In rebuild',age:5,tech:'R. Alvarez',due:'Dec 2'},
+{id:'WO-200421',cust:'Valley Freight Lines',what:'Charge air cooler',n:1,shop:'Evansville',st:'Received',age:0,tech:'',due:'Dec 1'},
+{id:'WO-200422',cust:'Hartwell Quarry',what:'Radiator, bolted tank',n:1,shop:'Louisville',st:'Received',age:0,tech:'',due:'Dec 3'},
+{id:'WO-200420',cust:'Bluestem Transit',what:'Radiator, copper/brass',n:2,shop:'Toledo',st:'Inspection test',age:1,tech:'J. Tran',due:'Nov 28'},
+{id:'WO-200416',cust:'Cedar Run Power',what:'Generator radiator',n:1,shop:'Louisville',st:'Waiting approval',age:4,tech:'K. Monroe',due:'Dec 4'},
+{id:'WO-200419',cust:'Midland Ag Supply',what:'Oil cooler',n:1,shop:'Evansville',st:'Waiting approval',age:1,tech:'S. Becker',due:'Dec 2'},
+{id:'WO-200412',cust:'Ohio River Barge Co.',what:'Tube and shell exchanger',n:1,shop:'Evansville',st:'In rebuild',age:6,tech:'D. Pruitt',due:'Nov 24',flag:'late'},
+{id:'CB-1042',cust:'Coldwater Mining',what:'Custom build, aluminum',n:1,shop:'Toledo',st:'In rebuild',age:9,tech:'J. Tran',due:'Dec 9'},
+{id:'WO-200415',cust:'Tri-County Fleet',what:'Radiator',n:1,shop:'Louisville',st:'Final test',age:0,tech:'R. Alvarez',due:'Nov 25',flag:'pass'},
+{id:'WO-200417',cust:'Hartwell Quarry',what:'Charge air cooler',n:1,shop:'Louisville',st:'Final test',age:1,tech:'K. Monroe',due:'Nov 26',flag:'leak'},
+{id:'WO-200411',cust:'Valley Freight Lines',what:'Radiator',n:1,shop:'Evansville',st:'Ready',age:0,tech:'S. Becker',due:'Nov 24'},
+{id:'WO-200413',cust:'Cedar Run Power',what:'Condenser',n:1,shop:'Toledo',st:'Ready',age:1,tech:'J. Tran',due:'Nov 24'}];
+const units=[
+{u:'Coil A1',st:'Final test',tech:'R. Alvarez',est:14,act:12.5,log:[]},{u:'Coil A2',st:'Ready',tech:'R. Alvarez',est:14,act:13,log:[]},
+{u:'Coil A3',st:'In rebuild',tech:'D. Pruitt',est:14,act:9.5,log:[]},{u:'Coil A4',st:'In rebuild',tech:'D. Pruitt',est:14,act:16,log:[]},
+{u:'Coil A5',st:'Inspection test',tech:'K. Monroe',est:14,act:1.5,log:[]},{u:'Coil A6',st:'In rebuild',tech:'R. Alvarez',est:14,act:4,log:[]}];
+const tests={};
+units.forEach((x,i)=>tests[x.u]={type:i===4?'Inspection test':'Final test',meth:'Nitrogen',psi:300,hold:30,leaks:new Set(i===4?[7,30,31]:[]),signed:i===1?'R. Alvarez':''});
+tests['WO-200417 CAC']={type:'Final test',meth:'Air under water',psi:30,hold:10,leaks:new Set([33,58]),signed:''};
+const quotes=[
+{id:'QT-5512',wo:'WO-200416',cust:'Cedar Run Power',unit:'Generator radiator, 4-row copper/brass',age:4,status:'Waiting',sent:'Nov 20',opened:2,opts:[
+{k:'Repair',d:'Rod out, re-solder 3 tubes, flush, pressure test',p:1840,lead:'2 days',m:46},{k:'Recore',d:'New 4-row core on existing tanks, test, paint',p:4960,lead:'5 days',m:38},{k:'Replace',d:'New aftermarket unit, fitted and tested',p:6300,lead:'7 days',m:22}]},
+{id:'QT-5515',wo:'WO-200419',cust:'Midland Ag Supply',unit:'Oil cooler',age:1,status:'Waiting',sent:'Nov 23',opened:0,opts:[
+{k:'Repair',d:'Clean, re-braze inlet, test',p:620,lead:'1 day',m:51},{k:'Replace',d:'New OEM-equivalent cooler',p:1480,lead:'4 days',m:24}]},
+{id:'QT-5509',wo:'WO-200409',cust:'Tri-County Fleet',unit:'Radiator',age:7,status:'Lost',reason:'Price',sent:'Nov 14',opened:3,opts:[{k:'Recore',d:'New 3-row core',p:2140,lead:'4 days',m:36}]},
+{id:'QT-5507',wo:'WO-200408',cust:'Bluestem Transit',unit:'Charge air cooler',age:8,status:'Approved',chosen:'Repair',sent:'Nov 13',opened:1,opts:[
+{k:'Repair',d:'Re-weld header, test',p:780,lead:'1 day',m:49},{k:'Replace',d:'New charge air cooler',p:2260,lead:'3 days',m:21}]}];
+const specs=[
+{pn:'RX-44718',oem:'CAT 3516 generator',type:'Soldered copper/brass',unit:'Generator radiator',core:'52 × 38.5 × 4 row',fpi:11,tube:'0.5 in copper',cust:'Cedar Run Power',price:4960,jobs:['WO-200416','WO-200377']},
+{pn:'RX-31205',oem:'Cummins QSK60',type:'Bolted tank',unit:'Radiator',core:'48 × 44 × 6 row',fpi:9,tube:'0.625 in copper',cust:'Coldwater Mining',price:7840,jobs:['WO-200355']},
+{pn:'CA-20931',oem:'Freightliner Cascadia',type:'Aluminum TIG-welded',unit:'Charge air cooler',core:'34 × 26 × 2.5 in',fpi:14,tube:'Flat aluminum',cust:'Valley Freight Lines',price:2260,jobs:['WO-200421','WO-200344','WO-200301']},
+{pn:'TS-11840',oem:'Custom',type:'Tube and shell',unit:'Heat exchanger',core:'8 in shell × 72 in, 114 tubes',fpi:0,tube:'0.375 in 90/10 CuNi',cust:'Ohio River Barge Co.',price:11200,jobs:['WO-200412']},
+{pn:'CL-60412',oem:'Liebert CW',type:'Replaceable tube',unit:'Cooling coil',core:'96 × 36 × 4 row',fpi:12,tube:'0.5 in copper',cust:'Northgate Data Center',price:6400,jobs:['WO-200418']},
+{pn:'RX-27751',oem:'Kenworth T880',type:'Soldered copper/brass',unit:'Radiator',core:'36 × 32 × 3 row',fpi:12,tube:'0.5 in copper',cust:'Tri-County Fleet',price:2140,jobs:['WO-200415','WO-200409']},
+{pn:'OC-08812',oem:'John Deere 9R',type:'Aluminum TIG-welded',unit:'Oil cooler',core:'22 × 8 × 2 in',fpi:16,tube:'Bar and plate',cust:'Midland Ag Supply',price:1480,jobs:['WO-200419']},
+{pn:'CB-1042',oem:'Custom build',type:'Aluminum TIG-welded',unit:'Radiator, custom',core:'60 × 48 × 4 in',fpi:10,tube:'Flat aluminum, 2-pass',cust:'Coldwater Mining',price:18900,jobs:['CB-1042']},
+{pn:'CD-15520',oem:'Carrier 30XA',type:'Replaceable tube',unit:'Condenser',core:'72 × 40 × 2 row',fpi:14,tube:'0.375 in copper',cust:'Cedar Run Power',price:3820,jobs:['WO-200413']},
+{pn:'RX-30019',oem:'Volvo VNL',type:'Bolted tank',unit:'Radiator',core:'38 × 34 × 2 row',fpi:13,tube:'Flat aluminum',cust:'Bluestem Transit',price:1960,jobs:['WO-200420']}];
+const K=[
+{k:'rev',t:'Weekly revenue closed',u:'$',sum:1,goal:187500,hi:1,s:[171200,182900,176400,190350,168800,179600,185100,164280],src:'Invoices dated in the week, from quote to cash.'},
+{k:'close',t:'Quote closing rate',u:'%',goal:65,hi:1,o:1,s:[61,63,66,64,68,62,67,64],src:'Quote value approved vs. sent.'},
+{k:'margin',t:'Gross margin by work order',u:'%',goal:35,hi:1,o:1,s:[36.2,37.8,35.1,39,38.4,36.9,37.2,38.4],src:'Invoice minus labor cost and parts cost on each job.'},
+{k:'turn',t:'Work order turnaround',u:'d',goal:3,o:.15,s:[3.4,3.2,3.6,3,2.9,3.3,3.1,3.1],src:'Intake date to Ready, from the board.'},
+{k:'ontime',t:'On-time delivery',u:'%',goal:90,hi:1,o:1,s:[86,88,91,89,92,87,90,88],src:'Ready date vs. the promised date set at intake.'},
+{k:'prod',t:'Technician productivity',u:'%',goal:80,hi:1,o:1,s:[78,81,79,83,80,84,82,82],src:'Hours on units vs. hours clocked in, from the tech phone.'},
+{k:'estact',t:'Actual vs. estimated labor',u:'%',goal:105,o:1,s:[112,108,104,109,103,107,106,104],src:'Clocked hours as a share of estimated hours per operation.'},
+{k:'wip',t:'Work in process',u:'$',sum:1,s:[208400,221300,198700,230100,241600,226900,219300,233800],src:'Open jobs valued at hours and parts, with their age.'},
+{k:'qturn',t:'Quote turnaround',u:'d',goal:2,o:.1,s:[2.6,2.2,1.9,2.4,1.7,2.1,1.6,1.8],src:'Inspection test complete to quote sent.'},
+{k:'lost',t:'Lost sales',u:'$',sum:1,s:[38200,29900,41300,33800,27600,35100,30400,36900],src:'Required lost reason on every closed quote.'},
+{k:'rework',t:'Rework / warranty rate',u:'%',goal:2,o:.2,s:[2.4,1.8,2.1,1.6,1.9,1.4,2.2,1.7],src:'Warranty jobs linked back to the original job and unit.'},
+{k:'ret',t:'Top customers still active',u:'%',goal:90,hi:1,o:1,s:[92,92,91,93,93,94,93,94],src:'Last year’s top 20 customers invoiced in the last 90 days.'}];
+const TITLES={start:'Start here',scorecard:'Scorecard',board:'Shop board',intake:'Intake',job:'Multi-unit job',test:'Test and QC',quote:'Quotes',library:'Build library',myday:'Tech phone'};
+const shopOk=j=>S.shop==='All shops'||j.shop===S.shop;
+let toastT;const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800)};
+const modal=h=>{$('#sheet').innerHTML=h+'<div class="row" style="justify-content:flex-end"><button class="btn" data-act="close">Close</button></div>';$('#modal').classList.add('on');$('#sheet button')?.focus()};
+const closeModal=()=>$('#modal').classList.remove('on');
+
+/* start */
+const STEPS=[['intake','Open a job at the counter','Fill the form and print a tag. No junk slip.','Bet 1'],['board','See it on the shop board','Drag jobs between your own statuses.','Bet 1'],
+['test','Test it and mark the leaks','Tap tubes on the map; sign it off; get a certificate.','Bet 4'],['quote','Quote three ways','Repair, recore or replace. Approve as the customer.','Bet 3'],
+['myday','Clock a tech onto the unit','The phone view a tech uses with gloves on.','Bet 2'],['job','Run a six-coil job','Each coil tracked on its own; invoice from the job.','Bets 1, 3'],
+['library','Find a past build','Search old cores by size or part number; quote from it.','Bet 5'],['scorecard','Read the scorecard','The KPIs that matter, by shop, any time.','Bet 5']];
+$('#steps').innerHTML=STEPS.map((s,i)=>`<a class="card step" href="#${s[0]}"><span class="n">${i+1}</span><h3>${s[1]}</h3><p class="small muted">${s[2]}</p><span class="note">${s[3]}</span></a>`).join('');
+
+/* scorecard */
+const kv=(k,i)=>{let v=k.s[i];if(S.shop!=='All shops')v=k.sum?v*SHARE[S.shop]:v+OFF[S.shop]*(k.o||1);return v};
+const kg=k=>k.goal==null?null:(k.sum&&S.shop!=='All shops'?k.goal*SHARE[S.shop]:k.goal);
+const fmt=(k,v)=>k.u==='$'?money(v):k.u==='%'?(Math.round(v*10)/10)+'%':(Math.round(v*10)/10).toFixed(1)+' days';
+const good=(k,v)=>{const g=kg(k);return g==null?null:(k.hi?v>=g:v<=g)};
+function rScore(){
+$('#sc-h').textContent=(S.shop==='All shops'?'All shops':S.shop)+', week of '+WEEKS[S.week];$('#wk').textContent=WEEKS[S.week];
+$('#tiles').innerHTML=K.map(k=>{const v=kv(k,S.week),p=kv(k,S.week-1),g=good(k,v),d=v-p;
+const st=g==null?'<span class="pill">Tracked</span>':g?'<span class="pill cool">On track</span>':'<span class="pill hot">Needs attention</span>';
+const dl=Math.abs(d)<.05?'Same as':(d>=0?'▲ ':'▼ ')+(k.u==='$'?money(Math.abs(d)):(Math.round(Math.abs(d)*10)/10)+(k.u==='%'?' pts':' days'));
+return `<button class="card tile ${S.kpi===k.k?'sel':''}" data-act="kpi" data-k="${k.k}"><span class="small muted">${k.t}</span><span class="v">${fmt(k,v)}</span><span class="row" style="gap:8px">${st}<span class="note">${dl}${Math.abs(d)<.05?' last week':' vs. last week'}</span></span>${kg(k)!=null?`<span class="note">Goal ${fmt(k,kg(k))}</span>`:''}</button>`}).join('');
+const k=K.find(x=>x.k===S.kpi);$('#kd-t').textContent=k.t;$('#kd-s').textContent='Where it comes from: '+k.src;
+let b='';
+if(k.k==='lost')b='<h3>Why quotes were lost</h3><div class="bars">'+[['Price',42],['Lead time',27],['Replaced unit',19],['Competitor',8],['Other',4]].map(r=>`<div class="b"><span>${r[0]}</span><span class="track"><span class="fill" style="display:block;width:${r[1]}%;background:var(--hot)"></span></span><span class="num">${r[1]}%</span></div>`).join('')+'</div>';
+else if(k.k==='margin')b='<h3>Jobs under 25% this week</h3><table><tr><td class="mono">WO-200398</td><td>Hartwell Quarry</td><td class="num">21.4%</td></tr></table><p class="note" style="margin-top:8px">Labor ran 6.5 hours over estimate on a bolted-tank recore.</p>';
+else if(k.k==='prod')b='<h3>By technician</h3><div class="bars">'+[['R. Alvarez',88],['D. Pruitt',84],['K. Monroe',79],['J. Tran',81],['S. Becker',76]].map(r=>`<div class="b"><span>${r[0]}</span><span class="track"><span class="fill" style="display:block;width:${r[1]}%;background:${r[1]>=80?'var(--cool)':'var(--hot)'}"></span></span><span class="num">${r[1]}%</span></div>`).join('')+'</div>';
+else if(k.k==='qturn'||k.k==='close')b='<h3>Waiting on customers</h3><table>'+quotes.filter(q=>q.status==='Waiting').map(q=>`<tr><td class="mono">${q.id}</td><td>${esc(q.cust)}</td><td class="num">${q.age} days</td></tr>`).join('')+'</table><p class="note" style="margin-top:8px"><a href="#quote">Open quotes</a></p>';
+else if(k.k==='wip')b='<h3>Oldest open jobs</h3><table>'+jobs.filter(j=>j.st!=='Ready'&&shopOk(j)).sort((a,c)=>c.age-a.age).slice(0,4).map(j=>`<tr><td class="mono">${j.id}</td><td>${esc(j.cust)}</td><td class="num">${j.age} days</td></tr>`).join('')+'</table>';
+else b=`<h3>How to read it</h3><p class="small">Blue is on track, orange needs attention. The goal is a setting, per shop and per company. Click any tile to see its trend.</p><p class="note" style="margin-top:8px">Bet 5 · Build library and scorecard</p>`;
+$('#kd-b').innerHTML=b;drawSpark()}
+function drawSpark(){const s=$('#spark');if(!s||!s.clientWidth)return;const W=s.clientWidth,H=s.clientHeight,k=K.find(x=>x.k===S.kpi);
+const vals=k.s.map((_,i)=>kv(k,i)),g=kg(k),all=g==null?vals:vals.concat(g),mn=Math.min(...all),mx=Math.max(...all),pad=(mx-mn)*.15||1;
+const L=8,R=8,T=14,B=26,x=i=>L+i*(W-L-R)/(vals.length-1),y=v=>T+(1-(v-mn+pad)/(mx-mn+2*pad))*(H-T-B);
+const pts=vals.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+s.innerHTML=(g!=null?`<line x1="${L}" x2="${W-R}" y1="${y(g)}" y2="${y(g)}" stroke="var(--muted)" stroke-dasharray="4 4"/><text x="${W-R}" y="${y(g)-6}" text-anchor="end" font-size="12" fill="var(--muted)">Goal</text>`:'')
++`<polyline points="${pts}" fill="none" stroke="var(--cool)" stroke-width="2.5"/>`+vals.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="${i===S.week?6:3.5}" fill="${i===S.week?(good(k,v)===false?'var(--hot)':'var(--cool)'):'var(--raised)'}" stroke="var(--cool)" stroke-width="2"/>`).join('')
++(W>420?WEEKS.map((w,i)=>`<text x="${x(i)}" y="${H-6}" text-anchor="${i===0?'start':i===7?'end':'middle'}" font-size="12" fill="var(--muted)">${w}</text>`).join(''):`<text x="${L}" y="${H-6}" font-size="12" fill="var(--muted)">${WEEKS[0]}</text><text x="${W-R}" y="${H-6}" text-anchor="end" font-size="12" fill="var(--muted)">${WEEKS[7]}</text>`)}
+const sparkRO=new ResizeObserver(drawSpark);sparkRO.observe($('#sparkbox'));
+
+/* board */
+function ageTag(j){if(j.flag==='late')return'<span class="pill hot">Past promised</span>';if(j.flag==='leak')return'<span class="pill hot">Leak at final</span>';if(j.flag==='pass')return'<span class="pill cool">Passed</span>';
+if(j.st==='Waiting approval'&&j.age>=3)return`<span class="pill hold">Waiting ${j.age} days</span>`;return`<span class="pill">${j.age} ${j.age===1?'day':'days'}</span>`}
+function rBoard(){$('#boardgrid').innerHTML=ST.map(s=>{const js=jobs.filter(j=>j.st===s&&shopOk(j));
+return `<div class="col" data-st="${s}"><div class="colh"><span>${s}</span><span class="muted">${js.length}</span></div>`+js.map(j=>`<div class="jc" draggable="true" data-id="${esc(j.id)}">
+<div class="row" style="justify-content:space-between;gap:6px"><span class="id">${esc(j.id)}</span>${ageTag(j)}</div><div>${esc(j.cust)}</div>
+<div class="meta">${esc(j.what)}${j.n>1?' · '+j.n+' units':''} · ${esc(j.shop)}</div><div class="meta">${j.tech?esc(j.tech):'Not assigned'} · due ${esc(j.due)}</div>
+<div class="row" style="gap:6px"><button class="btn sm" data-act="open" data-id="${esc(j.id)}">Open</button>${s!=='Ready'?`<button class="btn sm" data-act="move" data-id="${esc(j.id)}" aria-label="Move to next status">Move →</button>`:''}</div></div>`).join('')+'</div>'}).join('')}
+function moveJob(id,st,silent){const j=jobs.find(x=>x.id===id);if(!j)return;j.st=st;j.age=0;if(st!=='Final test')delete j.flag;
+if(!silent)toast(`${id} moved to ${st}. Logged with who and when.`);if(location.hash==='#board'){rBoard();$(`.jc[data-id="${CSS.escape(id)}"]`)?.classList.add('flash')}}
+function openJob(id){if(id==='WO-200418'){location.hash='job';return}const q=quotes.find(x=>x.wo===id);if(q){S.qsel=q.id;location.hash='quote';return}if(id==='WO-200417'){S.tunit='WO-200417 CAC';location.hash='test';return}
+const j=jobs.find(x=>x.id===id);modal(`<h2><span class="mono">${esc(j.id)}</span> · ${esc(j.cust)}</h2><p class="muted">${esc(j.what)} · ${esc(j.shop)} · ${esc(j.st)} · due ${esc(j.due)}</p>
+<ul class="tl"><li><span class="muted">Intake</span><span>Opened at the counter, photos and tag attached</span></li><li><span class="muted">Status</span><span>${esc(j.st)}${j.tech?' · '+esc(j.tech):''}</span></li></ul><p class="note">The six-coil job WO-200418 shows the full job view.</p><div class="row"><a class="btn" href="#job" data-act="close">See WO-200418</a></div>`)}
+
+/* intake */
+$('#intakeForm').addEventListener('change',e=>{if(e.target.name!=='photos')return;$('#thumbs').innerHTML='';[...e.target.files].slice(0,8).forEach(f=>{const i=document.createElement('img');i.alt='Intake photo';i.src=URL.createObjectURL(f);$('#thumbs').append(i)})});
+function tagSvg(id){let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))>>>0;const r=()=>(h=(h*1103515245+12345)>>>0)/4294967296;let o='';
+const fin=(x,y)=>`<rect x="${x}" y="${y}" width="7" height="7"/><rect x="${x+1}" y="${y+1}" width="5" height="5" fill="#fff"/><rect x="${x+2}" y="${y+2}" width="3" height="3"/>`;
+for(let y=0;y<21;y++)for(let x=0;x<21;x++){if((x<8&&y<8)||(x>12&&y<8)||(x<8&&y>12))continue;if(r()>.52)o+=`<rect x="${x}" y="${y}" width="1" height="1"/>`}
+return `<svg viewBox="-1 -1 23 23" width="132" height="132" aria-label="Tag code"><rect x="-1" y="-1" width="23" height="23" fill="#fff"/><g fill="#0E2A3F">${fin(0,0)}${fin(14,0)}${fin(0,14)}${o}</g></svg>`}
+$('#intakeForm').addEventListener('submit',e=>{e.preventDefault();const f=new FormData(e.target),id='WO-'+(S.next++),n=Math.max(1,Math.min(24,+f.get('n')||1));
+const due=f.get('due')?new Date(f.get('due')+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'TBD';
+jobs.unshift({id,cust:f.get('cust'),what:f.get('what'),n,shop:f.get('shop'),st:'Received',age:0,tech:'',due});
+const ph=$('#thumbs').children.length;
+modal(`<h2>Job opened: <span class="mono">${id}</span></h2><div class="row" style="align-items:flex-start;gap:20px"><div class="card" style="padding:14px;background:#fff;color:#0E2A3F">${tagSvg(id)}<p class="mono" style="font-size:14px;margin-top:6px">${id}</p><p style="font-size:13px">${esc(f.get('cust'))}</p><p style="font-size:13px">${esc(f.get('what'))}${n>1?' · 1 of '+n:''}</p></div>
+<div class="stackv small" style="flex:1 1 220px"><p><b>${esc(f.get('what'))}</b>, ${esc(f.get('cons'))}${f.get('core')?' · '+esc(f.get('core')):''}</p><p class="muted">“${esc(f.get('complaint'))}”</p><p>Promised ${esc(due)} · ${ph} photo${ph===1?'':'s'} · ${esc(f.get('shop'))}</p><p>It is on the shop board now, in Received. Every test, hour and part from here lands on this job.</p></div></div>
+<p class="note">Tag preview: concept only. A printed tag or QR label links the physical unit to its record.</p><div class="row"><a class="btn pri" href="#board" data-act="close">See it on the board</a></div>`)});
+
+/* job */
+function rJob(){const c={};units.forEach(x=>c[x.st]=(c[x.st]||0)+1);
+$('#jobbar').innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>Where the six coils are</h3><span class="note">${units.filter(x=>x.st==='Ready').length} of 6 ready</span></div>
+<div style="display:flex;height:16px;border-radius:8px;overflow:hidden;gap:2px">${ST.filter(s=>c[s]).map(s=>`<span title="${s}" style="flex:${c[s]};background:${s==='Ready'?'var(--cool)':s==='Final test'?'var(--cool-soft)':s==='In rebuild'?'#8A68B5':'var(--hold)'}"></span>`).join('')}</div>
+<div class="row note" style="margin-top:8px">${ST.filter(s=>c[s]).map(s=>`<span>${s}: ${c[s]}</span>`).join('<span>·</span>')}</div>`;
+$('#units').innerHTML='<tr><th>Unit</th><th>Status</th><th>Tech</th><th class="num">Est.</th><th class="num">Actual</th><th style="width:22%">Hours</th></tr>'+units.map((x,i)=>{const over=x.act>x.est;
+return `<tr class="click ${i===S.usel?'sel':''}" data-act="unit" data-i="${i}"><td class="mono">${x.u}</td><td><span class="pill ${x.st==='Ready'?'cool':''}">${x.st}</span></td><td>${x.tech}</td><td class="num">${x.est}</td><td class="num">${x.act}</td>
+<td><span class="track" style="display:block"><span class="fill" style="display:block;width:${Math.min(100,x.act/x.est*100)}%;background:${over?'var(--hot)':'var(--cool)'}"></span></span></td></tr>`}).join('');
+const u=units[S.usel],t=tests[u.u],idx=ST.indexOf(u.st);
+const hist=[['Nov 17','Received at the dock · 4 photos · tag printed'],['Nov 17',`Inspection test · Nitrogen 300 psi · ${u.u==='Coil A5'?'3 leaks so far':'2 leaks'}`]];
+if(idx>=2)hist.push(['Nov 18','Quote QT-5498 approved online · Recore']);if(idx>=3)hist.push(['Nov 19',`${u.tech} clocked on · Teardown, Retube`]);
+if(idx>=4)hist.push(['Nov 22',`Final test ${t.signed?'signed by '+t.signed:'in progress'}`]);if(idx>=5)hist.push(['Nov 22','QC checklist complete · moved to Ready']);
+u.log.forEach(l=>hist.push(['Today',l]));
+$('#unitside').innerHTML=`<div class="row" style="justify-content:space-between"><h3 class="mono">${u.u}</h3><span class="pill ${u.st==='Ready'?'cool':''}">${u.st}</span></div>
+<p class="small muted">Liebert CW · 96 × 36 × 4 row · build sheet <a href="#library" data-act="specgo" data-pn="CL-60412">CL-60412</a></p>
+<ul class="tl">${hist.map(h=>`<li><span class="muted">${h[0]}</span><span>${esc(h[1])}</span></li>`).join('')}</ul>
+<div class="row"><button class="btn" data-act="totest">Open test record</button>${u.st!=='Ready'?'<button class="btn pri" data-act="advance">Move to next status</button>':''}</div>
+${u.act>u.est?`<p class="pill hot" style="align-self:flex-start">${(u.act-u.est).toFixed(1)} hours over estimate</p>`:''}`}
+function invoice(){const hrs=units.reduce((a,x)=>a+x.act,0),lab=hrs*110,parts=6*3850,sup=Math.round((lab+parts)*.03),tot=lab+parts+sup;
+modal(`<h2>Invoice from <span class="mono">WO-200418</span></h2><p class="muted small">Built from the job: hours clocked by techs, parts pulled onto the job. Nothing re-typed.</p>
+<table><tr><th>Line</th><th class="num">Qty</th><th class="num">Amount</th></tr><tr><td>Labor, recore and test (6 coils)</td><td class="num">${hrs.toFixed(1)} h</td><td class="num">${money(lab)}</td></tr>
+<tr><td>Replacement cores, 4-row copper</td><td class="num">6</td><td class="num">${money(parts)}</td></tr><tr><td>Shop supplies</td><td class="num">3%</td><td class="num">${money(sup)}</td></tr>
+<tr><td><b>Total</b></td><td></td><td class="num"><b>${money(tot)}</b></td></tr></table>
+<p class="small">Six test certificates attach automatically. Posts to QuickBooks Online when approved.</p><p class="note">Sample rates and prices.</p>`)}
+
+/* test */
+function rTest(){const keys=Object.keys(tests);$('#tunit').innerHTML=keys.map(k=>`<option ${k===S.tunit?'selected':''}>${k}</option>`).join('');
+const t=tests[S.tunit];$('#ttype').value=t.type;$('#tmeth').value=t.meth;$('#tpsi').value=t.psi;$('#thold').value=t.hold;$('#tsigner').value=t.signed||'';
+$('#tubes').innerHTML=Array.from({length:96},(_,i)=>`<button class="tube ${t.leaks.has(i)?'leak':''}" data-act="tube" data-i="${i}" aria-label="Row ${Math.floor(i/24)+1} tube ${i%24+1}${t.leaks.has(i)?', leak':''}"></button>`).join('');
+const n=t.leaks.size;$('#tres').innerHTML=n?`<span class="pill hot">${n} leak${n>1?'s':''} · fail</span>`:'<span class="pill cool">No leaks · pass</span>';
+const qc=[['Tanks and headers inspected',1],['Core straight, fins combed',1],['Pressure test at spec and held',!n],['Ports capped, unit tagged',!!t.signed],['Paint and final photos',!!t.signed]];
+$('#qc').innerHTML=qc.map(q=>`<label class="row" style="gap:10px"><input type="checkbox" ${q[1]?'checked':''} disabled style="min-height:auto;width:20px;height:20px">${q[0]}</label>`).join('')+(t.signed?`<p class="pill cool" style="align-self:flex-start">Signed by ${esc(t.signed)}</p>`:'')}
+['ttype','tmeth','tpsi','thold','tsigner'].forEach(id=>$('#'+id).addEventListener('change',e=>{const t=tests[S.tunit],m={ttype:'type',tmeth:'meth',tpsi:'psi',thold:'hold',tsigner:'signed'}[id];
+t[m]=id==='tsigner'?'':e.target.value;if(id==='tsigner')S.signer=e.target.value;}));
+$('#tunit').addEventListener('change',e=>{S.tunit=e.target.value;S.signer='';rTest()});
+function sign(){const t=tests[S.tunit],who=$('#tsigner').value;if(!who){toast('Choose who is signing off first.');$('#tsigner').focus();return}
+const n=t.leaks.size,u=units.find(x=>x.u===S.tunit);
+if(n){t.signed='';u?.log.push(`${t.type}: ${n} leaks recorded by ${who}`);toast(`${n} leak${n>1?'s':''} recorded on ${S.tunit}. It stays in rebuild; the tech sees the map.`);if(u)u.st='In rebuild';rTest();return}
+t.signed=who;if(u){u.st=t.type==='Final test'?'Ready':'Waiting approval';u.log.push(`${t.type} passed, signed by ${who}`)}
+if(S.tunit==='WO-200417 CAC'){const j=jobs.find(x=>x.id==='WO-200417');j.flag='pass'}
+rTest();const no='TC-'+(S.tunit.startsWith('WO')?'200417':'200418-'+S.tunit.slice(-2));
+modal(`<div class="row" style="justify-content:space-between"><span style="font-size:22px;font-weight:500">tempered<span style="color:var(--hot)">.</span></span><span class="mono small">${no}</span></div>
+<h2>Test certificate</h2><table><tr><td class="muted">Unit</td><td>${esc(S.tunit)}${u?' · Northgate Data Center · WO-200418':' · Hartwell Quarry'}</td></tr><tr><td class="muted">Test</td><td>${esc(t.type)} · ${esc(t.meth)}</td></tr>
+<tr><td class="muted">Pressure and hold</td><td>${esc(t.psi)} psi for ${esc(t.hold)} minutes</td></tr><tr><td class="muted">Result</td><td><span class="pill cool">Pass · no leaks on 96 tubes</span></td></tr>
+<tr><td class="muted">Signed off</td><td>${esc(who)} · Nov 24, 2026</td></tr></table><p class="small">Attached to the invoice automatically and kept on the unit's history for the next time it comes in.</p><p class="note">Sample certificate.</p>`)}
+
+/* quotes */
+function rQuote(){const ord={Waiting:0,Draft:1,Approved:2,Lost:3};
+$('#qlist').innerHTML='<table>'+[...quotes].sort((a,b)=>ord[a.status]-ord[b.status]||b.age-a.age).map(q=>`<tr class="click ${q.id===S.qsel?'sel':''}" data-act="qsel" data-id="${q.id}"><td><span class="mono small">${q.id}</span><br><span class="small">${esc(q.cust)}</span></td>
+<td class="num"><span class="pill ${q.status==='Waiting'?(q.age>=3?'hold':''):q.status==='Approved'?'cool':q.status==='Lost'?'hot':''}">${q.status==='Waiting'?q.age+(q.age===1?' day':' days'):q.status}</span></td></tr>`).join('')+'</table>';
+const q=quotes.find(x=>x.id===S.qsel);let h=`<div class="row" style="justify-content:space-between"><div><h2><span class="mono">${q.id}</span> · ${esc(q.cust)}</h2><p class="muted small">${esc(q.unit)} · job ${esc(q.wo)} · ${q.status==='Draft'?'not sent yet':'sent '+q.sent+' · opened '+q.opened+(q.opened===1?' time':' times')}</p></div>
+<button class="btn sm" data-act="qview">${S.cust?'Back to shop view':'See what the customer sees'}</button></div>`;
+if(S.cust){h+=`<div class="custview stackv"><p class="small">Hi, here is our quote for your ${esc(q.unit.toLowerCase())}. Pick the option that suits you; we start as soon as you approve.</p>
+<div class="opts">${q.opts.map(o=>`<div class="card opt ${q.chosen===o.k?'won':''}"><h3>${o.k}</h3><p class="small muted">${esc(o.d)}</p><span class="p">${money(o.p)}</span><span class="small">Ready in ${o.lead}</span>${q.status==='Waiting'||q.status==='Draft'?`<button class="btn pri" data-act="qapprove" data-k="${o.k}">Approve ${o.k.toLowerCase()}</button>`:q.chosen===o.k?'<span class="pill cool">Approved</span>':''}</div>`).join('')}</div>
+<p class="note">Customer link, concept. Test photos and the leak map from inspection are attached to the quote.</p></div>`}
+else{h+=`<div class="opts">${q.opts.map(o=>`<div class="card opt ${q.chosen===o.k?'won':''}"><h3>${o.k}</h3><p class="small muted">${esc(o.d)}</p><span class="p">${money(o.p)}</span><span class="small">${o.lead} · <span class="${o.m<25?'pill hot':'pill cool'}">margin ${o.m}%</span></span></div>`).join('')}</div>`;
+if(q.status==='Waiting')h+=`<div class="row"><span class="small muted">Automatic follow-up: sent on day 2${q.age>=5?', and day 5':' · next on day 5'}</span></div>
+<div class="row"><button class="btn pri" data-act="qview">Approve as the customer</button><label class="row small muted">Phone approval <select id="qphone"><option value="">Choose option</option>${q.opts.map(o=>`<option>${o.k}</option>`).join('')}</select></label><button class="btn warn" data-act="qlost">Close as lost</button></div>`;
+if(q.status==='Draft')h+=`<div class="row"><button class="btn pri" data-act="qsend">Send to customer</button><span class="note">Started from build sheet ${esc(q.from)}.</span></div>`;
+if(q.status==='Approved')h+=`<p class="pill cool" style="align-self:flex-start">Approved: ${q.chosen}. The job moved to In rebuild.</p>`;
+if(q.status==='Lost')h+=`<p class="pill hot" style="align-self:flex-start">Lost · reason: ${esc(q.reason)}</p>`;
+if(S.lostOpen&&q.status==='Waiting')h+=`<div class="card stackv" style="background:var(--sunken)"><h3>Why was it lost?</h3><p class="small muted">A reason is required. It feeds the lost-sales number on the scorecard.</p><div class="chips">${['Price','Lead time','Competitor','Replaced unit','Other'].map(r=>`<button class="chip ${S.lost===r?'on':''}" data-act="reason" data-r="${r}">${r}</button>`).join('')}</div>
+<div class="row"><button class="btn warn" data-act="qlostok" ${S.lost?'':'disabled'}>Close as lost</button><button class="btn" data-act="qlostcancel">Cancel</button></div></div>`}
+h+='<p class="note">Bet 3 · Quote to cash</p>';$('#qdet').innerHTML=h;
+$('#qphone')?.addEventListener('change',e=>{if(e.target.value)approve(e.target.value,'phone')})}
+function approve(k,how){const q=quotes.find(x=>x.id===S.qsel);q.status='Approved';q.chosen=k;S.cust=false;const j=jobs.find(x=>x.id===q.wo);if(j)moveJob(j.id,'In rebuild',true);
+toast(`${q.id} approved${how==='phone'?' by phone':' online'}: ${k}. ${q.wo} moved to In rebuild.`);rQuote()}
+
+/* library */
+const TYPES=['All','Soldered copper/brass','Bolted tank','Aluminum TIG-welded','Replaceable tube','Tube and shell'];
+$('#libchips').innerHTML=TYPES.map(t=>`<button class="chip" data-act="chip" data-t="${t}">${t}</button>`).join('');
+$('#libq').addEventListener('input',rLib);
+function rLib(){$$('#libchips .chip').forEach(c=>c.classList.toggle('on',c.dataset.t===S.libType));const q=$('#libq').value.trim().toLowerCase();
+const rs=specs.filter(s=>(S.libType==='All'||s.type===S.libType)&&(!q||[s.pn,s.oem,s.cust,s.core,s.unit,s.tube].join(' ').toLowerCase().includes(q)));
+$('#libt').innerHTML='<thead><tr><th>Part no.</th><th>Unit</th><th>Core</th><th>Customer</th></tr></thead>'+(rs.length?rs.map(s=>`<tr class="click ${s.pn===S.spec?'sel':''}" data-act="spec" data-pn="${s.pn}"><td class="mono">${s.pn}</td><td>${esc(s.unit)}<br><span class="note">${esc(s.oem)}</span></td><td class="mono small">${esc(s.core)}</td><td>${esc(s.cust)}</td></tr>`).join(''):'<tr><td colspan="4" class="muted">No builds match. Try a part number, a size like 38.5, or an OEM.</td></tr>');
+const s=specs.find(x=>x.pn===S.spec);$('#libd').innerHTML=s?`<div class="row" style="justify-content:space-between"><h2 class="mono">${s.pn}</h2><span class="pill">${esc(s.type)}</span></div>
+<table><tr><td class="muted">Unit</td><td>${esc(s.unit)} · ${esc(s.oem)}</td></tr><tr><td class="muted">Core</td><td class="mono">${esc(s.core)}</td></tr><tr><td class="muted">Fins per inch</td><td class="mono">${s.fpi||'—'}</td></tr><tr><td class="muted">Tubes</td><td>${esc(s.tube)}</td></tr><tr><td class="muted">Last quoted</td><td class="mono">${money(s.price)}</td></tr><tr><td class="muted">Used on</td><td class="mono small">${s.jobs.join(', ')}</td></tr></table>
+<button class="btn pri" data-act="fromspec">Start a quote from this build</button><p class="note">Bet 5 · Build library. Fills as jobs run; old build sheets import from a spreadsheet if one exists.</p>`:'<p class="muted">Choose a build.</p>'}
+
+/* my day */
+const D={in:false,clock:0,cur:null,op:'Retube',paused:'',mins:{},log:[]};
+const PU=[{id:'Coil A3',job:'WO-200418',cust:'Northgate Data Center',next:'Braze'},{id:'Coil A4',job:'WO-200418',cust:'Northgate Data Center',next:'Test'},{id:'WO-200412',job:'WO-200412',cust:'Ohio River Barge Co.',next:'Retube'}];
+const OPS=['Teardown','Clean','Recore','Retube','Braze','Test','Paint'];
+const hm=m=>`${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}`;
+function rDay(){let h=`<div class="row" style="justify-content:space-between"><span class="muted small">Mon, Nov 24 · Evansville</span><span class="small">D. Pruitt</span></div>`;
+if(!D.in)h+=`<h2 style="font-size:24px">Good morning, Dana.</h2><p class="muted">Three units assigned today.</p><div style="flex:1"></div><button class="big" data-act="dayin">Start my day</button>`;
+else{h+=`<div class="row" style="justify-content:space-between"><span class="muted small">On the clock</span><span class="clock" data-t="clock">${hm(D.clock)}</span></div>`;
+h+=PU.map(p=>{const on=D.cur===p.id,m=D.mins[p.id]||0;return `<button class="pu ${on?'on':''}" data-act="pu" data-u="${p.id}"><span class="row" style="justify-content:space-between"><b class="mono" style="font-weight:500">${p.id}</b><span class="mono" data-t="u-${p.id}">${hm(m)}</span></span><span class="muted small">${esc(p.cust)} · next: ${p.next}</span>${on?`<span class="small" style="display:block;color:#5AA6DC">${D.paused?'Paused · '+D.paused:'Working · '+D.op}</span>`:''}</button>`}).join('');
+if(D.cur){h+=`<p class="muted small">Operation</p><div class="ops">${OPS.map(o=>`<button class="${D.op===o?'on':''}" data-act="op" data-o="${o}">${o}</button>`).join('')}</div>`;
+h+=D.paused?`<button class="big" data-act="resume">Resume</button>`:`<button class="big ghost" data-act="pause">Pause</button>`;
+if(D.paused==='?')h+=`<div class="ops" style="grid-template-columns:1fr 1fr">${['Waiting parts','Waiting approval','Break','Helping another tech'].map(r=>`<button data-act="pr" data-r="${r}">${r}</button>`).join('')}</div>`}
+h+=`<div style="flex:1"></div><button class="big stop" data-act="dayout">End my day</button>`}
+$('#scr').innerHTML=h;rSum()}
+function rSum(){const on=Object.values(D.mins).reduce((a,b)=>a+b,0),pct=D.clock?Math.round(on/D.clock*100):0;
+$('#daysum').innerHTML=`<h3>What the office sees, live</h3><table><tr><td>Clocked in</td><td class="num" data-t="sc">${hm(D.clock)}</td></tr><tr><td>On units</td><td class="num" data-t="so">${hm(on)}</td></tr><tr><td>Productivity</td><td class="num" data-t="sp">${D.clock?pct+'%':'—'}</td></tr></table>
+<ul class="tl">${D.log.slice(-5).reverse().map(l=>`<li><span class="muted mono">${l[0]}</span><span>${esc(l[1])}</span></li>`).join('')||'<li><span></span><span class="muted">Nothing yet. Start the day on the phone.</span></li>'}</ul>`}
+const logD=t=>D.log.push([hm(D.clock),t]);
+setInterval(()=>{if(!D.in)return;D.clock++;if(D.cur&&!D.paused)D.mins[D.cur]=(D.mins[D.cur]||0)+1;
+const set=(k,v)=>$$(`[data-t="${k}"]`).forEach(e=>e.textContent=v);set('clock',hm(D.clock));PU.forEach(p=>set('u-'+p.id,hm(D.mins[p.id]||0)));
+const on=Object.values(D.mins).reduce((a,b)=>a+b,0);set('sc',hm(D.clock));set('so',hm(on));set('sp',D.clock?Math.round(on/D.clock*100)+'%':'—')},1000);
+
+/* actions */
+document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a)return;const d=a.dataset,act=d.act;
+if(act==='close'){closeModal();return}
+if(act==='week'){S.week=Math.max(1,Math.min(7,S.week+ +d.d));rScore()}
+else if(act==='kpi'){S.kpi=d.k;rScore()}
+else if(act==='move'){const j=jobs.find(x=>x.id===d.id);moveJob(d.id,ST[ST.indexOf(j.st)+1])}
+else if(act==='open')openJob(d.id);
+else if(act==='unit'){S.usel=+d.i;rJob()}
+else if(act==='advance'){const u=units[S.usel],n=ST[ST.indexOf(u.st)+1];if(n==='Ready'&&!tests[u.u].signed){toast(`${u.u} needs a signed final test before Ready.`);return}u.st=n;u.log.push('Moved to '+n);toast(`${u.u} moved to ${n}.`);rJob()}
+else if(act==='totest'){S.tunit=units[S.usel].u;location.hash='test'}
+else if(act==='invoice')invoice();
+else if(act==='tube'){const t=tests[S.tunit],i=+d.i;t.leaks.has(i)?t.leaks.delete(i):t.leaks.add(i);t.signed='';rTest()}
+else if(act==='sign')sign();
+else if(act==='qsel'){S.qsel=d.id;S.cust=false;S.lostOpen=false;S.lost=null;rQuote()}
+else if(act==='qview'){S.cust=!S.cust;rQuote()}
+else if(act==='qapprove')approve(d.k,'online');
+else if(act==='qsend'){const q=quotes.find(x=>x.id===S.qsel);q.status='Waiting';q.sent='Nov 24';q.opened=0;q.age=0;toast(`${q.id} sent as a link. Follow-ups go out on day 2 and day 5.`);rQuote()}
+else if(act==='qlost'){S.lostOpen=true;S.lost=null;rQuote()}
+else if(act==='reason'){S.lost=d.r;rQuote()}
+else if(act==='qlostcancel'){S.lostOpen=false;rQuote()}
+else if(act==='qlostok'){const q=quotes.find(x=>x.id===S.qsel);q.status='Lost';q.reason=S.lost;S.lostOpen=false;toast(`${q.id} closed as lost: ${S.lost}. Counted on the scorecard.`);rQuote()}
+else if(act==='chip'){S.libType=d.t;rLib()}
+else if(act==='spec'||act==='specgo'){S.spec=d.pn;if(act==='spec')rLib()}
+else if(act==='fromspec'){const s=specs.find(x=>x.pn===S.spec),id='QT-'+(5516+quotes.length);
+quotes.unshift({id,wo:'New job',cust:s.cust,unit:s.unit,age:0,status:'Draft',sent:'',opened:0,from:s.pn,opts:[{k:'Repair',d:'Repair to the stored spec, test',p:Math.round(s.price*.38/10)*10,lead:'2 days',m:44},{k:'Recore',d:'New core built to '+s.pn+', test, paint',p:s.price,lead:'5 days',m:37},{k:'Replace',d:'New unit to the same spec',p:Math.round(s.price*1.3/10)*10,lead:'7 days',m:23}]});
+S.qsel=id;S.cust=false;toast(`${id} started from ${s.pn}: specs and last price filled in.`);location.hash='quote'}
+else if(act==='dayin'){D.in=true;logD('Clocked in for the day');rDay()}
+else if(act==='dayout'){logD('Clocked out');const on=Object.values(D.mins).reduce((a,b)=>a+b,0);D.in=false;D.cur=null;D.paused='';rDay();toast(`Day closed: ${hm(on)} on units of ${hm(D.clock)} clocked.`)}
+else if(act==='pu'){if(D.cur!==d.u){if(D.cur)logD('Clocked off '+D.cur);D.cur=d.u;D.paused='';D.op=PU.find(p=>p.id===d.u).next;logD(`Clocked on ${d.u} · ${D.op}`)}rDay()}
+else if(act==='op'){D.op=d.o;logD(`${D.cur} · ${d.o}`);rDay()}
+else if(act==='pause'){D.paused='?';rDay()}
+else if(act==='pr'){D.paused=d.r;logD(`Paused ${D.cur} · ${d.r}`);rDay()}
+else if(act==='resume'){D.paused='';logD('Resumed '+D.cur);rDay()}
+});
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+/* drag and drop */
+let dragId=null;
+$('#boardgrid').addEventListener('dragstart',e=>{const c=e.target.closest('.jc');if(!c)return;dragId=c.dataset.id;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',dragId)});
+$('#boardgrid').addEventListener('dragover',e=>{const c=e.target.closest('.col');if(!c)return;e.preventDefault();$$('.col.over').forEach(x=>x!==c&&x.classList.remove('over'));c.classList.add('over')});
+$('#boardgrid').addEventListener('dragleave',e=>{const c=e.target.closest('.col');if(c&&!c.contains(e.relatedTarget))c.classList.remove('over')});
+$('#boardgrid').addEventListener('drop',e=>{const c=e.target.closest('.col');if(!c||!dragId)return;e.preventDefault();c.classList.remove('over');const j=jobs.find(x=>x.id===dragId);if(j&&j.st!==c.dataset.st)moveJob(dragId,c.dataset.st);dragId=null});
+$('#shop').addEventListener('change',e=>{S.shop=e.target.value;route()});
+/* router */
+const R={start:()=>{},scorecard:rScore,board:rBoard,intake:()=>{},job:rJob,test:rTest,quote:rQuote,library:rLib,myday:rDay};
+function route(){let v=location.hash.slice(1);if(!R[v])v='start';closeModal();$$('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
+$$('.nav').forEach(n=>n.classList.toggle('on',n.getAttribute('href')==='#'+v));$('#vt').textContent=TITLES[v];
+if(v==='quote'&&!quotes.find(q=>q.id===S.qsel))S.qsel=quotes[0].id;R[v]();window.scrollTo(0,0)}
+window.addEventListener('hashchange',route);route();
+}
+</script>
+</body>
+</html>
